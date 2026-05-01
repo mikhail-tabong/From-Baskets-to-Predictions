@@ -15,11 +15,14 @@ co_occur_count      How many carts contain *both* A and B (from full cart log)
 freq_A              How often product A appears across all carts
 freq_B              How often product B appears across all carts
 """
-import json, pathlib
+import json, logging, pathlib
 import pandas as pd
 import numpy as np
 from pandas import Timestamp
 from collections import defaultdict
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)s  %(message)s")
+log = logging.getLogger(__name__)
 
 ROOT = pathlib.Path(__file__).parent
 DATA_RAW = ROOT / "data_raw"
@@ -28,6 +31,7 @@ DATA_RAW = ROOT / "data_raw"
 pairs    = pd.read_csv(ROOT / "pairs.csv")
 products = pd.json_normalize(json.load(open(DATA_RAW / "products.json"))).set_index("id")
 carts    = json.load(open(DATA_RAW / "carts.json"))
+log.info("Loaded %d pairs, %d products, %d carts", len(pairs), len(products), len(carts))
 
 # Build co-occurrence and frequency maps from the full cart log
 co_occur  = defaultdict(int)
@@ -74,5 +78,5 @@ y = pairs["label"]
 X.to_parquet(ROOT / "X.parquet")
 y.to_csv(ROOT / "y.csv", index=False)
 
-print(f"✓ Features saved — {X.shape[0]} rows × {X.shape[1]} features")
-print(X.describe().round(3).to_string())
+log.info("✓ Features saved — %d rows × %d features", X.shape[0], X.shape[1])
+log.info("Feature summary:\n%s", X.describe().round(3).to_string())
