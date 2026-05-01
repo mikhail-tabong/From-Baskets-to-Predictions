@@ -19,7 +19,6 @@ env/
 *.ipynb_checkpoints
 
 # Data — raw and intermediate files committed intentionally; exclude generated artifacts
-models/
 *.log
 
 # OS
