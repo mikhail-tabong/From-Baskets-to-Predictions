@@ -1,11 +1,16 @@
-import itertools, random, json, pandas as pd
+import itertools, random, json, pathlib, pandas as pd
+
+random.seed(42)
+
+DATA_RAW = pathlib.Path(__file__).parent / "data_raw"
+OUT = pathlib.Path(__file__).parent
 
 def ordered_pairs(items):
     return list(itertools.permutations(items, 2))
 
 # Load data
-carts = json.load(open("/Users/kyle/Desktop/Current Working Directory/Module6Assignment/data_raw/carts.json"))
-products = json.load(open("/Users/kyle/Desktop/Current Working Directory/Module6Assignment/data_raw/products.json"))
+carts = json.load(open(DATA_RAW / "carts.json"))
+products = json.load(open(DATA_RAW / "products.json"))
 all_product_ids = [p["id"] for p in products]
 
 positive_pairs = []
@@ -34,6 +39,6 @@ df_neg = pd.DataFrame(random.sample(negative_pairs, num_samples), columns=["A", 
 
 # Combine and shuffle
 df_all = pd.concat([df_pos, df_neg]).sample(frac=1, random_state=42).reset_index(drop=True)
-df_all.to_csv("pairs.csv", index=False)
+df_all.to_csv(OUT / "pairs.csv", index=False)
 
 print(f"✓ Created {len(df_all)} labeled pairs ({num_samples} positives, {num_samples} negatives)")

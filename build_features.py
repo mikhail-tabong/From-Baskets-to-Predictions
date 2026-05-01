@@ -1,9 +1,13 @@
-import pandas as pd, json
+import json, pathlib
+import pandas as pd
 from pandas import Timestamp
 
+ROOT = pathlib.Path(__file__).parent
+DATA_RAW = ROOT / "data_raw"
+
 # Load data
-pairs = pd.read_csv("pairs.csv")
-products = pd.json_normalize(json.load(open("data_raw/products.json"))).set_index("id")
+pairs = pd.read_csv(ROOT / "pairs.csv")
+products = pd.json_normalize(json.load(open(DATA_RAW / "products.json"))).set_index("id")
 
 def create_features(row):
     A, B = row["A"], row["B"]
@@ -20,6 +24,6 @@ def create_features(row):
 X = pairs.apply(create_features, axis=1, result_type="expand")
 y = pairs["label"]
 
-X.to_parquet("X.parquet")
-y.to_csv("y.csv", index=False)
+X.to_parquet(ROOT / "X.parquet")
+y.to_csv(ROOT / "y.csv", index=False)
 print("✓ Features saved to X.parquet and y.csv")
